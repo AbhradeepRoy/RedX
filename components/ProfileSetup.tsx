@@ -5,20 +5,21 @@ import { useApp } from '../contexts/AppContext';
 interface ProfileSetupProps {
   email: string;
   onComplete: (profile: Partial<UserProfile>) => void;
+  initialData?: Partial<UserProfile>;
 }
 
-export const ProfileSetup: React.FC<ProfileSetupProps> = ({ email, onComplete }) => {
+export const ProfileSetup: React.FC<ProfileSetupProps> = ({ email, onComplete, initialData }) => {
   const { t } = useApp();
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    dob: '',
-    bloodGroup: '',
-    contactNumber: '',
-    otherMedicalCondition: '',
+    name: initialData?.name || '',
+    address: initialData?.address || '',
+    dob: initialData?.dob || '',
+    bloodGroup: initialData?.bloodGroup || '',
+    contactNumber: initialData?.contactNumber || '',
+    otherMedicalCondition: initialData?.otherMedicalCondition || '',
   });
 
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(initialData?.medicalConditions || []);
 
   const handleConditionToggle = (condition: string) => {
     setSelectedConditions(prev => 
@@ -37,10 +38,12 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ email, onComplete })
     });
   };
 
+  const isEditing = !!initialData?.name;
+
   return (
     <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up border border-gray-100 dark:border-slate-800">
       <div className="bg-gray-900 dark:bg-slate-950 px-8 py-6">
-        <h2 className="text-xl font-bold text-white">{t('completeProfile')}</h2>
+        <h2 className="text-xl font-bold text-white">{isEditing ? t('editProfile') : t('completeProfile')}</h2>
         <p className="text-gray-400 mt-1">{t('needDetails')}</p>
       </div>
       
@@ -149,7 +152,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ email, onComplete })
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none transition-colors"
         >
-          {t('saveVerify')}
+          {isEditing ? t('updateProfile') : t('saveVerify')}
         </button>
       </form>
     </div>

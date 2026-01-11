@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, HeartPulse, ChevronDown, LogOut, Sun, Moon, Globe, Phone } from 'lucide-react';
+import { User, HeartPulse, ChevronDown, LogOut, Sun, Moon, Globe, Phone, Edit } from 'lucide-react';
 import { UserProfile } from '../types';
 import { useApp, LANGUAGES } from '../contexts/AppContext';
 import { Language } from '../translations';
@@ -8,9 +8,10 @@ interface LayoutProps {
   children: React.ReactNode;
   user: UserProfile | null;
   onLogout: () => void;
+  onEditProfile: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, onEditProfile }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showLang, setShowLang] = useState(false);
   const { isDarkMode, toggleTheme, language, setLanguage, t } = useApp();
@@ -75,8 +76,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
 
-              {/* User Profile */}
-              {user && (
+              {/* User Profile - Only show if name exists (post-registration) */}
+              {user && user.name && (
                 <div className="relative ml-2">
                   <button 
                     onClick={() => setShowProfile(!showProfile)}
@@ -100,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                         <div className="grid grid-cols-2 gap-2">
                           <div className="bg-gray-50 dark:bg-slate-800 p-2 rounded-lg">
                             <span className="block text-xs text-gray-400 uppercase font-bold">{t('profile')}</span>
-                            <span className="font-medium text-brand-600 dark:text-brand-400 uppercase">{user.role}</span>
+                            <span className="font-medium text-brand-600 dark:text-brand-400 uppercase">{user.role || 'Pending'}</span>
                           </div>
                           <div className="bg-gray-50 dark:bg-slate-800 p-2 rounded-lg">
                             <span className="block text-xs text-gray-400 uppercase font-bold">{t('bloodGroup')}</span>
@@ -125,7 +126,17 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
                         )}
                       </div>
 
-                      <div className="border-t border-gray-100 dark:border-slate-800 p-2">
+                      <div className="border-t border-gray-100 dark:border-slate-800 p-2 space-y-1">
+                        <button
+                          onClick={() => {
+                              setShowProfile(false);
+                              onEditProfile();
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl flex items-center gap-2 transition-colors"
+                        >
+                          <Edit className="h-4 w-4" /> {t('editProfile')}
+                        </button>
+
                         <button
                           onClick={onLogout}
                           className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl flex items-center gap-2 transition-colors"

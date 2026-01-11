@@ -9,7 +9,7 @@ import { UserProfile } from './types';
 import { AppProvider } from './contexts/AppContext';
 
 // App Stages
-type AppStage = 'register' | 'profile' | 'role' | 'dashboard';
+type AppStage = 'register' | 'profile' | 'role' | 'dashboard' | 'edit-profile';
 
 const MainApp: React.FC = () => {
   const [stage, setStage] = useState<AppStage>('register');
@@ -22,7 +22,11 @@ const MainApp: React.FC = () => {
 
   const handleProfileComplete = (profileData: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...profileData }));
-    setStage('role');
+    if (stage === 'edit-profile') {
+        setStage('dashboard');
+    } else {
+        setStage('role');
+    }
   };
 
   const handleRoleComplete = (roleData: Partial<UserProfile>) => {
@@ -35,6 +39,10 @@ const MainApp: React.FC = () => {
     setStage('register');
   };
 
+  const handleEditProfile = () => {
+      setStage('edit-profile');
+  };
+
   const renderContent = () => {
     switch (stage) {
       case 'register':
@@ -43,6 +51,10 @@ const MainApp: React.FC = () => {
       case 'profile':
         if (!user?.email) return null;
         return <ProfileSetup email={user.email} onComplete={handleProfileComplete} />;
+        
+      case 'edit-profile':
+        if (!user?.email) return null;
+        return <ProfileSetup email={user.email} onComplete={handleProfileComplete} initialData={user} />;
       
       case 'role':
         return <RoleSelection onRoleComplete={handleRoleComplete} />;
@@ -63,7 +75,7 @@ const MainApp: React.FC = () => {
   };
 
   return (
-    <Layout user={user as UserProfile} onLogout={handleLogout}>
+    <Layout user={user as UserProfile} onLogout={handleLogout} onEditProfile={handleEditProfile}>
       {/* Key prop ensures the animation triggers when stage changes */}
       <div key={stage} className="animate-fade-in w-full">
         {renderContent()}
